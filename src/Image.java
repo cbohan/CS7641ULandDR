@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Image {
-	private float[][][] imageData;
+	private double[] imageData;
 	private String imageName;
 	private int imageSize;
 	private int width, height;
@@ -27,13 +27,16 @@ public class Image {
 			width = img.getWidth();
 			height = img.getHeight();
 			
-			imageData = new float[imageSize][imageSize][3];
+			imageData = new double[imageSize * imageSize];
 			float[] pixel = new float[4];
 			for (int x = 0; x < imageSize; x++) {
 				for (int y = 0; y < imageSize; y++) {
 					img.getRaster().getPixel(x, y, pixel);
-					for (int rgb = 0; rgb < 3; rgb++)
-						imageData[x][y][rgb] = pixel[rgb] / 255f;
+					double totalRGB = 0;
+					for (int rgb = 0; rgb < 3; rgb++) {
+						totalRGB += pixel[rgb] / 255.0;
+					}
+					imageData[(x * imageSize) + y] = totalRGB / 3.0;
 				}
 			}
 			
@@ -44,11 +47,10 @@ public class Image {
 	
 	public Image copy() {
 		Image image = new Image();
-		image.imageData = new float[imageSize][imageSize][3];
+		image.imageData = new double[imageSize * imageSize];
 		for (int x = 0; x < imageSize; x++)
 			for (int y = 0; y < imageSize; y++)
-				for (int rgb = 0; rgb < 3; rgb++)
-					image.imageData[x][y][rgb] = this.imageData[x][y][rgb];
+				image.imageData[x * imageSize + y] = this.imageData[x * imageSize + y];
 		image.imageName = this.imageName;
 		image.imageSize = this.imageSize;
 		image.width = this.width;
@@ -57,8 +59,7 @@ public class Image {
 		return image;
 	}
 	
-	public float getImageData(int x, int y, int rgb) { return imageData[x][y][rgb]; }
-	public void setImageData(int x, int y, int rgb, float value) { imageData[x][y][rgb] = value; }
+	public double[] getImageData() { return imageData; }
 	public int getImageSize() { return imageSize; }
 	public String getImageName() { return imageName; }
 	public int getWidth() { return width; }
@@ -69,8 +70,10 @@ public class Image {
 		
 		for (int x = 0; x < image1.imageSize; x++) 
 			for (int y = 0; y < image1.imageSize; y++) 
-				for (int rgb = 0; rgb < 3; rgb++) 
-					distanceSquared += (image1.imageData[x][y][rgb] - image2.imageData[x][y][rgb]) * (image1.imageData[x][y][rgb] - image2.imageData[x][y][rgb]);
+				distanceSquared += (image1.imageData[x * image1.imageSize + y] - 
+					image2.imageData[x * image1.imageSize + y]) * 
+					(image1.imageData[x * image1.imageSize + y] - 
+					image2.imageData[x * image1.imageSize + y]);
 		
 		return Math.sqrt(distanceSquared);
 	}
