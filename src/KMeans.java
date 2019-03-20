@@ -9,7 +9,25 @@ import weka.core.Debug.Random;
 import weka.core.EuclideanDistance;
 
 public class KMeans {	
-	public static void doKMeans(String dataset, int k, int groupSize, String[] groupNames) {
+	public static int[] doKMeans(String dataset, int k, int groupSize, String[] groupNames) {
+		try {
+			Instances data = new Instances(new BufferedReader(new FileReader(dataset))); 
+			data.setClassIndex(data.numAttributes() - 1);
+			Remove filter = new Remove();
+			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
+			filter.setInputFormat(data);
+			Instances dataClusterer = Filter.useFilter(data, filter);
+			return doKMeans(dataClusterer, k, groupSize, groupNames);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public static int[] doKMeans(Instances dataset, int k, int groupSize, String[] groupNames) {
+		System.out.println("\nK-Means Clustering:");
+		
 		SimpleKMeans kmeans = new SimpleKMeans();
 		Random rand = new Random();
 		kmeans.setSeed(rand.nextInt());
@@ -17,25 +35,24 @@ public class KMeans {
 		try {
 			kmeans.setNumClusters(k);
 			kmeans.setDistanceFunction(new EuclideanDistance());
-			Instances data = new Instances(new BufferedReader(new FileReader(dataset))); 
-			data.setClassIndex(data.numAttributes() - 1);
-			Remove filter = new Remove();
-			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
-			filter.setInputFormat(data);
-			Instances dataClusterer = Filter.useFilter(data, filter);
-			
-			kmeans.buildClusterer(dataClusterer);
+			kmeans.buildClusterer(dataset);
 			
 			int[] assignments = kmeans.getAssignments();
 			int i=0;
 			for(int clusterNum : assignments) {
 				int groupNum = i / groupSize;
-				String groupName = groupNames[groupNum];
-			    System.out.printf(groupName + " -> Cluster " + clusterNum + " \n");
+				if (groupNames != null) {
+					String groupName = groupNames[groupNum];
+				    System.out.print(groupName + " -> Cluster " + clusterNum + " \n");
+				}
 			    i++;
 			}
+			
+			return assignments;
 		} catch (Exception e) { 
 			e.printStackTrace();		
 		}
+		
+		return null;
 	}
 }

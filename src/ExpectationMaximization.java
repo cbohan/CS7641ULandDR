@@ -8,41 +8,57 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class ExpectationMaximization {
-	public static void doEM(String dataset, int k, int groupSize, String[] groupNames) {
-		EM em = new EM();
-		Random rand = new Random();
-		em.setSeed(rand.nextInt());
+	public static int[] doEM(String dataset, int k, int groupSize, String[] groupNames) {
 		try {
-			em.setNumClusters(k);
-			em.setMaxIterations(1000);
 			Instances data = new Instances(new BufferedReader(new FileReader(dataset))); 
 			data.setClassIndex(data.numAttributes() - 1);
 			Remove filter = new Remove();
 			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
 			filter.setInputFormat(data);
 			Instances dataClusterer = Filter.useFilter(data, filter);
+			return doEM(dataClusterer, k, groupSize, groupNames);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public static int[] doEM(Instances data, int k, int groupSize, String[] groupNames) {
+		System.out.println("\nEM Clustering:");
+		
+		EM em = new EM();
+		Random rand = new Random();
+		em.setSeed(rand.nextInt());
+		try {
+			em.setNumClusters(k);
+			em.setMaxIterations(1000);
+			em.buildClusterer(data);
 			
-			
-			em.buildClusterer(dataClusterer);
+			int[] assignments = new int[data.size()];
 						
-			for (int i = 0; i < dataClusterer.size(); i++) {
+			for (int i = 0; i < data.size(); i++) {
 				int groupNum = i / groupSize;
-				String groupName = groupNames[groupNum];
 				
 				int bestCluster = 0;
 				double highestClusterProb = 0;
 				for (int j = 0; j < k; j++) {
-					if (em.distributionForInstance(dataClusterer.get(i))[j] > highestClusterProb) {
+					if (em.distributionForInstance(data.get(i))[j] > highestClusterProb) {
 						bestCluster = j;
-						highestClusterProb = em.distributionForInstance(dataClusterer.get(i))[j];
+						highestClusterProb = em.distributionForInstance(data.get(i))[j];
 					}
 				}
 				
-			    System.out.printf(groupName + " -> Cluster " + bestCluster + " \n");
-			    i++;
+				assignments[i] = bestCluster; 
+				if (groupNames != null) {
+					String groupName = groupNames[groupNum];
+				    System.out.print(groupName + " -> Cluster " + bestCluster + " \n");
+				}
 			}
 		} catch (Exception e) { 
 			e.printStackTrace();		
 		}
+		
+		return null;
 	}
 }

@@ -1,39 +1,43 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Random;
 
-import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
+import weka.filters.unsupervised.attribute.RandomSubset;
 import weka.filters.unsupervised.attribute.Remove;
 
-public class PCA {
-	public static Instances doPCA(String dataset, double vc) { 
-		return doPCA(dataset, vc, false, null); 
+public class RandomSubsetFilter {
+	public static Instances doRandomSubsetFilter(String dataset, int ouputNumAtts) {
+		return doRandomSubsetFilter(dataset, ouputNumAtts, false, null);
 	}
-	public static Instances doPCA(String dataset, double vc, boolean printEigenValues, String[] pokemonNames) {
+	
+	public static Instances doRandomSubsetFilter(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames) {
 		try {
 			Instances data = new Instances(new BufferedReader(new FileReader(dataset)));
 			data.setClassIndex(data.numAttributes() - 1);
 			Remove filter = new Remove();
 			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
 			filter.setInputFormat(data);
-			Instances dataPCA = Filter.useFilter(data, filter);
+			Instances dataRS = Filter.useFilter(data, filter);
 			
-			PrincipalComponents pca = new PrincipalComponents();
-			pca.setVarianceCovered(vc);
-			pca.buildEvaluator(dataPCA);
-			Instances transformed = pca.transformedData(dataPCA);
-						
-			if (printEigenValues) {
-				int substantialEigenValues = 0;
-				for (int i = 0; i < pca.getEigenValues().length; i++) {
-					substantialEigenValues += (pca.getEigenValues()[i] > .01) ? 1 : 0;
-					System.out.println(pca.getEigenValues()[i]);
-				}
-				System.out.println(substantialEigenValues + " / " + pca.getEigenValues().length);
-			}
+			RandomSubset rsFilter = new RandomSubset();
+			Random rand = new Random();
+			rsFilter.setSeed(rand.nextInt());
+			rsFilter.setNumAttributes(outputNumAtts);
+			rsFilter.setInputFormat(dataRS);
+			for (int i = 0; i < dataRS.numInstances(); i++)
+				rsFilter.input(dataRS.instance(i));
+			rsFilter.batchFinished();
+			Instances transformedData = rsFilter.getOutputFormat();
+			Instance processed;
+			while ((processed = rsFilter.output()) != null)
+				transformedData.add(processed);		
+			
+			if (printInstances)
+				System.out.println(transformedData);
 			
 			if (pokemonNames != null) {
 				Add pokemonName = new Add();
@@ -46,11 +50,11 @@ public class PCA {
 				}
 				pokemonName.setNominalLabels(possibleNames);
 				pokemonName.setAttributeName("name");
-				pokemonName.setInputFormat(transformed);
-				Instances newData = Filter.useFilter(transformed, pokemonName);
+				pokemonName.setInputFormat(transformedData);
+				Instances newData = Filter.useFilter(transformedData, pokemonName);
 				newData.setClassIndex(newData.numAttributes() - 1);				
 				
-				for (int i = 0; i < transformed.size(); i++) {
+				for (int i = 0; i < transformedData.size(); i++) {
 					Instance curInstance = newData.get(i);
 					String curName = pokemonNames[i / 25];
 					curInstance.setValue(newData.numAttributes() - 1, curName);
@@ -59,7 +63,7 @@ public class PCA {
 				return newData;
 			}
 			
-			return transformed;
+			return transformedData;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
