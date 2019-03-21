@@ -31,16 +31,10 @@ public class Main {
 		PokemonARFFGenerator.generateFile(25, false);
 		DigitARFFGenerator.generateFile();
 		
-		
-		
-		//doPokemonDimensionalityReducedNN(PCA.doPCA(POKEMON_TRAINING_DATASET, false, pokemonNames));
-		//doPokemonDimensionalityReducedNN(ICA.doICA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
-		//doPokemonDimensionalityReducedNN(RCA.doRCA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
-		//doPokemonDimensionalityReducedNN(RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2, false, pokemonNames));
-		
 		//doExperiment1();
 		//doExperiment2();
-		doExperiment3();
+		//doExperiment3();
+		doExperiment4();
 		//doExperiment5();		
 	}
 	
@@ -56,46 +50,70 @@ public class Main {
 	
 	private static void doExperiment2() {
 		System.out.println("Digit PCA: ");
-		PCA.doPCA(DIGIT_TEST_DATASET, .95, true, null);
+		PCA.doPCA(DIGIT_TEST_DATASET, .95, true, null, true);
 		System.out.println("\n\nPokemon PCA: ");
-		PCA.doPCA(POKEMON_TRAINING_DATASET, .95, true, null);
+		PCA.doPCA(POKEMON_TRAINING_DATASET, .95, true, null, true);
 		
 		System.out.println("DIGIT ICA: ");
 		ICA.doICA(DIGIT_TEST_DATASET, 10, true, null);
 		System.out.println("\n\nPOKEMON ICA: ");
 		ICA.doICA(POKEMON_TRAINING_DATASET, 6, true, null);
 		
+		System.out.println("DIGIT RCA: ");
+		RCA.doRCA(DIGIT_TEST_DATASET, 10, true, null);
+		System.out.println("\n\nPOKEMON RCA: ");
+		RCA.doRCA(POKEMON_TRAINING_DATASET, 6, true, null);
 		
-		//RCA.doRCA(DIGIT_TEST_DATASET, 10);
-		//RCA.doRCA(POKEMON_TRAINING_DATASET, 6);
-		//RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TEST_DATASET, 10);
-		//RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2);	
+		RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TEST_DATASET, 10);
+		RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2);	
 	}
 	
 	private static void doExperiment3() {
-		//KMeans.doKMeans(PCA.doPCA(DIGIT_TRAINING_DATASET, .95), 5, 15, digitNames);
-		//ExpectationMaximization.doEM(PCA.doPCA(DIGIT_TRAINING_DATASET, .95), 5, 15, digitNames);
+		KMeans.doKMeans(PCA.doPCA(DIGIT_TRAINING_DATASET, .95), 5, 15, digitNames);
+		ExpectationMaximization.doEM(PCA.doPCA(DIGIT_TRAINING_DATASET, .95), 5, 15, digitNames);
 		
-		//KMeans.doKMeans(PCA.doPCA(POKEMON_TRAINING_DATASET, .95), 34, 25, pokemonNames);
-		//ExpectationMaximization.doEM(PCA.doPCA(POKEMON_TRAINING_DATASET, .95), 34, 25, pokemonNames);
+		KMeans.doKMeans(PCA.doPCA(POKEMON_TRAINING_DATASET, .95), 34, 25, pokemonNames);
+		ExpectationMaximization.doEM(PCA.doPCA(POKEMON_TRAINING_DATASET, .95), 34, 25, pokemonNames);
 		
-		//KMeans.doKMeans(ICA.doICA(DIGIT_TRAINING_DATASET, 3), 5, 15, digitNames);
-		//ExpectationMaximization.doEM(ICA.doICA(DIGIT_TRAINING_DATASET, 3), 5, 15, digitNames);
+		KMeans.doKMeans(ICA.doICA(DIGIT_TRAINING_DATASET, 3), 5, 15, digitNames);
+		ExpectationMaximization.doEM(ICA.doICA(DIGIT_TRAINING_DATASET, 3), 5, 15, digitNames);
 		
-		//KMeans.doKMeans(ICA.doICA(POKEMON_TRAINING_DATASET, 10), 34, 25, pokemonNames);
-		//ExpectationMaximization.doEM(ICA.doICA(POKEMON_TRAINING_DATASET, 10), 34, 25, pokemonNames);
+		KMeans.doKMeans(ICA.doICA(POKEMON_TRAINING_DATASET, 10), 34, 25, pokemonNames);
+		ExpectationMaximization.doEM(ICA.doICA(POKEMON_TRAINING_DATASET, 10), 34, 25, pokemonNames);
 		
-		//KMeans.doKMeans(RCA.doRCA(DIGIT_TRAINING_DATASET, 50), 5, 15, digitNames);
-		//ExpectationMaximization.doEM(RCA.doRCA(DIGIT_TRAINING_DATASET, 50), 5, 15, digitNames);
+		KMeans.doKMeans(RCA.doRCA(DIGIT_TRAINING_DATASET, 50), 5, 15, digitNames);
+		ExpectationMaximization.doEM(RCA.doRCA(DIGIT_TRAINING_DATASET, 50), 5, 15, digitNames);
 				
-		//KMeans.doKMeans(RCA.doRCA(POKEMON_TRAINING_DATASET, 7), 34, 25, pokemonNames);
+		KMeans.doKMeans(RCA.doRCA(POKEMON_TRAINING_DATASET, 7), 34, 25, pokemonNames);
 		ExpectationMaximization.doEM(RCA.doRCA(POKEMON_TRAINING_DATASET, 7), 34, 25, pokemonNames);
-				
+		
+		KMeans.doKMeans(RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TRAINING_DATASET, 500), 5, 15, digitNames);
+		ExpectationMaximization.doEM(RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TRAINING_DATASET, 500), 5, 15, digitNames);
+						
+		KMeans.doKMeans(RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 9), 34, 25, pokemonNames);
+		ExpectationMaximization.doEM(RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 7), 34, 25, pokemonNames);		
+	}
+	
+	private static void doExperiment4() {
+		long startTime = System.nanoTime();
+		
+		doPokemonDimensionalityReducedNN(
+				PCA.doPCA(POKEMON_TRAINING_DATASET, 1, false, pokemonNames, true),
+				PCA.doPCA(POKEMON_TEST_DATASET, 1, false, pokemonNames, false));
+		//doPokemonDimensionalityReducedNN(ICA.doICA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
+		//doPokemonDimensionalityReducedNN(RCA.doRCA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
+		//doPokemonDimensionalityReducedNN(RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2, false, pokemonNames));
+		
+		long endTime = System.nanoTime();
+		long difference = endTime - startTime;
+		double seconds = (double)difference / 1000000000.0;
+		
+		System.out.println("RUNNING TIME: " + seconds);
 	}
 	
 	private static void doExperiment5() {
 		try {
-			Instances pcaPokemon = PCA.doPCA(POKEMON_TRAINING_DATASET, .95, false, pokemonNames);
+			Instances pcaPokemon = PCA.doPCA(POKEMON_TRAINING_DATASET, .95, false, pokemonNames, true);
 			pcaPokemon.setClassIndex(pcaPokemon.numAttributes() - 1);
 			Remove filter = new Remove();
 			filter.setAttributeIndices(("" + (pcaPokemon.classIndex() + 1)));
@@ -103,7 +121,7 @@ public class Main {
 			Instances pcaPokemonSansClassIndex = Filter.useFilter(pcaPokemon, filter);
 			
 			int[] pokemonClusters = KMeans.doKMeans(pcaPokemonSansClassIndex, 34, 25, pokemonNames);
-			doPokemonDimensionalityReducedNN(prependClusterToInstance(pcaPokemon, pokemonClusters));
+			//doPokemonDimensionalityReducedNN(prependClusterToInstance(pcaPokemon, pokemonClusters));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -132,17 +150,18 @@ public class Main {
 		return null;
 	}
 	
-	private static void doPokemonDimensionalityReducedNN(Instances drInstances) {			
+	private static void doPokemonDimensionalityReducedNN(Instances drInstances, Instances testInstances) {			
 		MultilayerPerceptron pokemonNeuralNetworkClassifier = new MultilayerPerceptron();
 		pokemonNeuralNetworkClassifier.setLearningRate(0.1);
 		pokemonNeuralNetworkClassifier.setMomentum(0.2);
 		pokemonNeuralNetworkClassifier.setTrainingTime(NEURAL_NET_TRAINING_TIME);
 		pokemonNeuralNetworkClassifier.setHiddenLayers("a");
+		
 		try {
 			pokemonNeuralNetworkClassifier.buildClassifier(drInstances);
 			
 			Evaluation pokemonEvaluation = new Evaluation(drInstances);
-			pokemonEvaluation.evaluateModel(pokemonNeuralNetworkClassifier, drInstances);
+			pokemonEvaluation.evaluateModel(pokemonNeuralNetworkClassifier, testInstances);
 			
 			System.out.print("Pokemon correctly classified by neural net: ");
 			System.out.println(100.0 * pokemonEvaluation.correct() / pokemonEvaluation.numInstances() + "%");

@@ -9,10 +9,12 @@ import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class PCA {
+	private static PrincipalComponents pca;
+
 	public static Instances doPCA(String dataset, double vc) { 
-		return doPCA(dataset, vc, false, null); 
+		return doPCA(dataset, vc, false, null, true); 
 	}
-	public static Instances doPCA(String dataset, double vc, boolean printEigenValues, String[] pokemonNames) {
+	public static Instances doPCA(String dataset, double vc, boolean printEigenValues, String[] pokemonNames, boolean createNewPCA) {
 		try {
 			Instances data = new Instances(new BufferedReader(new FileReader(dataset)));
 			data.setClassIndex(data.numAttributes() - 1);
@@ -21,9 +23,11 @@ public class PCA {
 			filter.setInputFormat(data);
 			Instances dataPCA = Filter.useFilter(data, filter);
 			
-			PrincipalComponents pca = new PrincipalComponents();
-			pca.setVarianceCovered(vc);
-			pca.buildEvaluator(dataPCA);
+			if (createNewPCA){
+				pca = new PrincipalComponents();
+				pca.setVarianceCovered(vc);
+				pca.buildEvaluator(dataPCA);
+			}
 			Instances transformed = pca.transformedData(dataPCA);
 						
 			if (printEigenValues) {

@@ -7,10 +7,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.Random;
 
-public class PokemonARFFGenerator {
-	private static final int WRITES_PER_POKEMON_TEST = 100;
-	
-	
+public class PokemonARFFGenerator {	
 	//Creates two arff files. One contains the training data for the pokemon and the other 
 	//contains the test data.
 	public static void generateFile(int writesPerPokemonTraining, boolean showOutput) {
@@ -21,8 +18,6 @@ public class PokemonARFFGenerator {
 			for (File file : new File[] { training, test } )
 			{
 				int writesPerPokemon = writesPerPokemonTraining;
-				if (file.equals(test))
-					writesPerPokemon = WRITES_PER_POKEMON_TEST;
 				
 				FileOutputStream outputStream = new FileOutputStream(file);
 				BufferedWriter bufferedWriter 
