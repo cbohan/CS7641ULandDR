@@ -10,11 +10,13 @@ import weka.filters.unsupervised.attribute.RandomSubset;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class RandomSubsetFilter {
+	static RandomSubset rsFilter;
+	
 	public static Instances doRandomSubsetFilter(String dataset, int ouputNumAtts) {
-		return doRandomSubsetFilter(dataset, ouputNumAtts, false, null);
+		return doRandomSubsetFilter(dataset, ouputNumAtts, false, null, true);
 	}
 	
-	public static Instances doRandomSubsetFilter(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames) {
+	public static Instances doRandomSubsetFilter(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames, boolean createNewRandomSubset) {
 		try {
 			Instances data = new Instances(new BufferedReader(new FileReader(dataset)));
 			data.setClassIndex(data.numAttributes() - 1);
@@ -23,11 +25,13 @@ public class RandomSubsetFilter {
 			filter.setInputFormat(data);
 			Instances dataRS = Filter.useFilter(data, filter);
 			
-			RandomSubset rsFilter = new RandomSubset();
-			Random rand = new Random();
-			rsFilter.setSeed(rand.nextInt());
-			rsFilter.setNumAttributes(outputNumAtts);
-			rsFilter.setInputFormat(dataRS);
+			if (createNewRandomSubset) {
+				rsFilter = new RandomSubset();
+				Random rand = new Random();
+				rsFilter.setSeed(rand.nextInt());
+				rsFilter.setNumAttributes(outputNumAtts);
+				rsFilter.setInputFormat(dataRS);
+			}
 			for (int i = 0; i < dataRS.numInstances(); i++)
 				rsFilter.input(dataRS.instance(i));
 			rsFilter.batchFinished();

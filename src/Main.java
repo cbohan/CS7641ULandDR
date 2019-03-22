@@ -55,14 +55,14 @@ public class Main {
 		PCA.doPCA(POKEMON_TRAINING_DATASET, .95, true, null, true);
 		
 		System.out.println("DIGIT ICA: ");
-		ICA.doICA(DIGIT_TEST_DATASET, 10, true, null);
+		ICA.doICA(DIGIT_TEST_DATASET, 10, true, null, true);
 		System.out.println("\n\nPOKEMON ICA: ");
-		ICA.doICA(POKEMON_TRAINING_DATASET, 6, true, null);
+		ICA.doICA(POKEMON_TRAINING_DATASET, 6, true, null, true);
 		
 		System.out.println("DIGIT RCA: ");
-		RCA.doRCA(DIGIT_TEST_DATASET, 10, true, null);
+		RCA.doRCA(DIGIT_TEST_DATASET, 10, true, null, true);
 		System.out.println("\n\nPOKEMON RCA: ");
-		RCA.doRCA(POKEMON_TRAINING_DATASET, 6, true, null);
+		RCA.doRCA(POKEMON_TRAINING_DATASET, 6, true, null, true);
 		
 		RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TEST_DATASET, 10);
 		RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2);	
@@ -100,9 +100,18 @@ public class Main {
 		doPokemonDimensionalityReducedNN(
 				PCA.doPCA(POKEMON_TRAINING_DATASET, 1, false, pokemonNames, true),
 				PCA.doPCA(POKEMON_TEST_DATASET, 1, false, pokemonNames, false));
-		//doPokemonDimensionalityReducedNN(ICA.doICA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
-		//doPokemonDimensionalityReducedNN(RCA.doRCA(POKEMON_TRAINING_DATASET, 9, false, pokemonNames));
-		//doPokemonDimensionalityReducedNN(RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2, false, pokemonNames));
+		
+		doPokemonDimensionalityReducedNN(
+				ICA.doICA(POKEMON_TRAINING_DATASET, 1, false, pokemonNames, true),
+				ICA.doICA(POKEMON_TEST_DATASET, 1, false, pokemonNames, false));
+		
+		doPokemonDimensionalityReducedNN(
+				RCA.doRCA(POKEMON_TRAINING_DATASET, 11, false, pokemonNames, true),
+				RCA.doRCA(POKEMON_TEST_DATASET, 11, false, pokemonNames, false));
+		
+		doPokemonDimensionalityReducedNN(
+				RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 3, false, pokemonNames, true),
+				RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TEST_DATASET, 3, false, pokemonNames, false));
 		
 		long endTime = System.nanoTime();
 		long difference = endTime - startTime;

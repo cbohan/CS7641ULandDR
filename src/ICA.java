@@ -1,59 +1,43 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
-
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.IndependentComponents;
+import weka.filters.unsupervised.attribute.Remove;
 
 public class ICA {
+	static IndependentComponents icaFilter;
+	
 	public static Instances doICA(String dataset, int outputNumAtts) {
-		return doICA(dataset, outputNumAtts, false, null);
+		return doICA(dataset, outputNumAtts, false, null, true);
 	}
 	
-	public static Instances doICA(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames) {
+	public static Instances doICA(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames, boolean createNewICA) {
 		try {
-			Instances dataICA = new Instances(new BufferedReader(new FileReader(dataset)));
+			Instances data = new Instances(new BufferedReader(new FileReader(dataset)));
+			data.setClassIndex(data.numAttributes() - 1);
+			Remove filter = new Remove();
+			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
+			filter.setInputFormat(data);
+			Instances dataICA = Filter.useFilter(data, filter);
 			
-			IndependentComponents icaFilter = new IndependentComponents();
-			icaFilter.setInputFormat(dataICA);
-			icaFilter.setOutputNumAtts(outputNumAtts);
+			if (createNewICA) {
+				icaFilter = new IndependentComponents();
+				icaFilter.setInputFormat(dataICA);
+				icaFilter.setOutputNumAtts(outputNumAtts);	
+			}
+			
 			for (int i = 0; i < dataICA.numInstances(); i++)
 				icaFilter.input(dataICA.instance(i));
-			icaFilter.batchFinished();			
+			icaFilter.batchFinished();		
 			Instances transformedData = icaFilter.getOutputFormat();
 			Instance processed;
 			while ((processed = icaFilter.output()) != null)
 				transformedData.add(processed);
-			
-			if (printInstances) {
-				System.out.println(transformedData);
-				
-				Kurtosis kurtosis = new Kurtosis();
-				double[][] values = new double[transformedData.size()][outputNumAtts];
-				for (int i = 0; i < transformedData.size(); i++) {
-					Instance curInstance = transformedData.get(i);
-					for (int j = 0; j < curInstance.toDoubleArray().length; j++)
-						values[i][j] = curInstance.toDoubleArray()[j];
-					
-				}
-				
-				double avgK = 0;
-				double[] kurtValues = new double[transformedData.size()];
-				for (int i = 0; i < outputNumAtts; i++) {
-					for (int j = 0; j < transformedData.size(); j++)
-						kurtValues[j] = values[j][i];
-					
-					System.out.println(kurtosis.evaluate(kurtValues));
-					avgK += Math.abs(kurtosis.evaluate(kurtValues));
-				}
-				System.out.println(avgK / outputNumAtts);
-				
-			}
-			
+
 			if (pokemonNames != null) {
 				Add pokemonName = new Add();
 				pokemonName.setAttributeIndex("last");
@@ -75,9 +59,13 @@ public class ICA {
 					curInstance.setValue(newData.numAttributes() - 1, curName);
 				}
 				
+				if (printInstances) 
+					System.out.println(newData);
 				return newData;
 			}
 			
+			if (printInstances) 
+				System.out.println(transformedData);
 			return transformedData;
 		} catch (Exception e) {
 			e.printStackTrace();

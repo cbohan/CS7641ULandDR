@@ -10,10 +10,12 @@ import weka.filters.unsupervised.attribute.RandomProjection;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class RCA {
+	static RandomProjection rcaFilter;
+	
 	public static Instances doRCA(String dataset, int outputNumAtts) {
-		return doRCA(dataset, outputNumAtts, false, null);
+		return doRCA(dataset, outputNumAtts, false, null, true);
 	}
-	public static Instances doRCA(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames) {
+	public static Instances doRCA(String dataset, int outputNumAtts, boolean printInstances, String[] pokemonNames, boolean createNewRCA) {
 		try {
 			Instances data = new Instances(new BufferedReader(new FileReader(dataset)));
 			data.setClassIndex(data.numAttributes() - 1);
@@ -22,11 +24,14 @@ public class RCA {
 			filter.setInputFormat(data);
 			Instances dataRCA = Filter.useFilter(data, filter);
 			
-			RandomProjection rcaFilter = new RandomProjection();
-			Random rand = new Random();
-			rcaFilter.setSeed(rand.nextInt());
-			rcaFilter.setNumberOfAttributes(outputNumAtts);
-			rcaFilter.setInputFormat(dataRCA);
+			if (createNewRCA) {
+				rcaFilter = new RandomProjection();
+				Random rand = new Random();
+				rcaFilter.setSeed(rand.nextInt());
+				rcaFilter.setNumberOfAttributes(outputNumAtts);
+				rcaFilter.setInputFormat(dataRCA);
+			}
+			
 			for (int i = 0; i < dataRCA.numInstances(); i++)
 				rcaFilter.input(dataRCA.instance(i));
 			rcaFilter.batchFinished();
