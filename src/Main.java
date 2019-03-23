@@ -122,7 +122,8 @@ public class Main {
 	}
 	
 	private static void doExperiment5() {
-		try {
+		//PCA
+		/*try {
 			Instances pcaPokemon = PCA.doPCA(POKEMON_TRAINING_DATASET, .95, false, pokemonNames, true);
 			pcaPokemon.setClassIndex(pcaPokemon.numAttributes() - 1);
 			Remove filter = new Remove();
@@ -134,6 +135,38 @@ public class Main {
 			int[] pokemonClusters = ExpectationMaximization.doEM(pcaPokemonSansClassIndex, 34, 25, pokemonNames);
 			
 			Instances prependedClustersInstances = prependClusterToInstance(pcaPokemon, pokemonClusters);
+			prependedClustersInstances.randomize(new Random());
+			
+			int folds = 10;
+			Random rand = new Random();
+			double totalPercent = 0;
+			
+			for (int i = 0; i < folds; i++) {
+				Instances train = prependedClustersInstances.trainCV(folds, i, rand);
+				Instances test = prependedClustersInstances.testCV(folds, i);
+				
+				totalPercent += doPokemonDimensionalityReducedNN(train, test, true);
+			}
+			
+			System.out.print("Pokemon correctly classified by neural net: ");
+			System.out.println((totalPercent / folds) + "%");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
+		
+		//ICA
+		try {
+			Instances icaPokemon = ICA.doICA(POKEMON_TRAINING_DATASET, 11, false, pokemonNames, true);
+			icaPokemon.setClassIndex(icaPokemon.numAttributes() - 1);
+			Remove filter = new Remove();
+			filter.setAttributeIndices(("" + (icaPokemon.classIndex() + 1)));
+			filter.setInputFormat(icaPokemon);
+			Instances icaPokemonSansClassIndex = Filter.useFilter(icaPokemon, filter);
+						
+			//int[] pokemonClusters = KMeans.doKMeans(icaPokemonSansClassIndex, 34, 25, pokemonNames);
+			int[] pokemonClusters = ExpectationMaximization.doEM(icaPokemonSansClassIndex, 34, 25, pokemonNames);
+			
+			Instances prependedClustersInstances = prependClusterToInstance(icaPokemon, pokemonClusters);
 			prependedClustersInstances.randomize(new Random());
 			
 			int folds = 10;
