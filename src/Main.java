@@ -36,7 +36,7 @@ public class Main {
 		//doExperiment2();
 		//doExperiment3();
 		//doExperiment4();
-		doExperiment5();		
+		//doExperiment5();		
 	}
 	
 	private static void doExperiment1() {
@@ -65,7 +65,9 @@ public class Main {
 		System.out.println("\n\nPOKEMON RCA: ");
 		RCA.doRCA(POKEMON_TRAINING_DATASET, 6, true, null, true);
 		
+		System.out.println("DIGIT Random Subset Filter: ");
 		RandomSubsetFilter.doRandomSubsetFilter(DIGIT_TEST_DATASET, 10);
+		System.out.println("\n\nPOKEMON Random Subset Filter");
 		RandomSubsetFilter.doRandomSubsetFilter(POKEMON_TRAINING_DATASET, 2);	
 	}
 	
@@ -123,7 +125,7 @@ public class Main {
 	
 	private static void doExperiment5() {
 		//PCA
-		/*try {
+		try {
 			Instances pcaPokemon = PCA.doPCA(POKEMON_TRAINING_DATASET, .95, false, pokemonNames, true);
 			pcaPokemon.setClassIndex(pcaPokemon.numAttributes() - 1);
 			Remove filter = new Remove();
@@ -152,7 +154,7 @@ public class Main {
 			System.out.println((totalPercent / folds) + "%");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 		
 		//ICA
 		try {

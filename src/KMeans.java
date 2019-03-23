@@ -48,6 +48,8 @@ public class KMeans {
 			    i++;
 			}
 			
+			System.out.println("Squared error: " + kmeans.getSquaredError());
+			
 			return assignments;
 		} catch (Exception e) { 
 			e.printStackTrace();		

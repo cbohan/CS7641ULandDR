@@ -56,6 +56,7 @@ public class ExpectationMaximization {
 				}
 			}
 			
+			
 			return assignments;
 		} catch (Exception e) { 
 			e.printStackTrace();		
