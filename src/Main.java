@@ -34,7 +34,7 @@ public class Main {
 		//doExperiment1();
 		//doExperiment2();
 		//doExperiment3();
-		doExperiment4();
+		//doExperiment4();
 		//doExperiment5();		
 	}
 	
