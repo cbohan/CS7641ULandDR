@@ -55,6 +55,8 @@ public class ExpectationMaximization {
 				    System.out.print(groupName + " -> Cluster " + bestCluster + " \n");
 				}
 			}
+			
+			return assignments;
 		} catch (Exception e) { 
 			e.printStackTrace();		
 		}

@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Random;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
@@ -35,7 +36,7 @@ public class Main {
 		//doExperiment2();
 		//doExperiment3();
 		//doExperiment4();
-		//doExperiment5();		
+		doExperiment5();		
 	}
 	
 	private static void doExperiment1() {
@@ -128,9 +129,26 @@ public class Main {
 			filter.setAttributeIndices(("" + (pcaPokemon.classIndex() + 1)));
 			filter.setInputFormat(pcaPokemon);
 			Instances pcaPokemonSansClassIndex = Filter.useFilter(pcaPokemon, filter);
+						
+			//int[] pokemonClusters = KMeans.doKMeans(pcaPokemonSansClassIndex, 34, 25, pokemonNames);
+			int[] pokemonClusters = ExpectationMaximization.doEM(pcaPokemonSansClassIndex, 34, 25, pokemonNames);
 			
-			int[] pokemonClusters = KMeans.doKMeans(pcaPokemonSansClassIndex, 34, 25, pokemonNames);
-			//doPokemonDimensionalityReducedNN(prependClusterToInstance(pcaPokemon, pokemonClusters));
+			Instances prependedClustersInstances = prependClusterToInstance(pcaPokemon, pokemonClusters);
+			prependedClustersInstances.randomize(new Random());
+			
+			int folds = 10;
+			Random rand = new Random();
+			double totalPercent = 0;
+			
+			for (int i = 0; i < folds; i++) {
+				Instances train = prependedClustersInstances.trainCV(folds, i, rand);
+				Instances test = prependedClustersInstances.testCV(folds, i);
+				
+				totalPercent += doPokemonDimensionalityReducedNN(train, test, true);
+			}
+			
+			System.out.print("Pokemon correctly classified by neural net: ");
+			System.out.println((totalPercent / folds) + "%");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -159,7 +177,11 @@ public class Main {
 		return null;
 	}
 	
-	private static void doPokemonDimensionalityReducedNN(Instances drInstances, Instances testInstances) {			
+	private static double doPokemonDimensionalityReducedNN(Instances drInstances, Instances testInstances) {
+		return doPokemonDimensionalityReducedNN(drInstances, testInstances, false);
+	}
+	
+	private static double doPokemonDimensionalityReducedNN(Instances drInstances, Instances testInstances, boolean cv) {			
 		MultilayerPerceptron pokemonNeuralNetworkClassifier = new MultilayerPerceptron();
 		pokemonNeuralNetworkClassifier.setLearningRate(0.1);
 		pokemonNeuralNetworkClassifier.setMomentum(0.2);
@@ -172,11 +194,18 @@ public class Main {
 			Evaluation pokemonEvaluation = new Evaluation(drInstances);
 			pokemonEvaluation.evaluateModel(pokemonNeuralNetworkClassifier, testInstances);
 			
-			System.out.print("Pokemon correctly classified by neural net: ");
-			System.out.println(100.0 * pokemonEvaluation.correct() / pokemonEvaluation.numInstances() + "%");
+			double percentCorrect = 100.0 * pokemonEvaluation.correct() / pokemonEvaluation.numInstances();
+			if (cv == false) {
+				System.out.print("Pokemon correctly classified by neural net: ");
+				System.out.println(percentCorrect + "%");
+			}
+			
+			return percentCorrect;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return 0;
 	}
 
 }
