@@ -57,4 +57,40 @@ public class KMeans {
 		
 		return null;
 	}
+	
+	public static double kMeansAverageSquaredError(String dataset, int k, int groupSize, String[] groupNames, int runs) {
+		double totalError = 0;
+		for (int i = 0; i < runs; i++)
+			totalError += kMeansSquaredError(dataset, k, groupSize, groupNames);
+		
+		return totalError / runs;
+	}
+	
+	private static double kMeansSquaredError(String datasetName, int k, int groupSize, String[] groupNames) {
+		
+		try {
+			Instances data = new Instances(new BufferedReader(new FileReader(datasetName))); 
+			data.setClassIndex(data.numAttributes() - 1);
+			Remove filter = new Remove();
+			filter.setAttributeIndices(("" + (data.classIndex() + 1)));
+			filter.setInputFormat(data);
+			Instances dataset = Filter.useFilter(data, filter);
+			
+			SimpleKMeans kmeans = new SimpleKMeans();
+			Random rand = new Random();
+			kmeans.setSeed(rand.nextInt());
+			kmeans.setPreserveInstancesOrder(true);
+			
+			kmeans.setNumClusters(k);
+			kmeans.setDistanceFunction(new EuclideanDistance());
+			kmeans.buildClusterer(dataset);
+	
+			return kmeans.getSquaredError();
+			
+		} catch (Exception e) { 
+			e.printStackTrace();		
+		}
+		
+		return 0;
+	}
 }

@@ -32,13 +32,16 @@ public class Main {
 		PokemonARFFGenerator.generateFile(25, false);
 		DigitARFFGenerator.generateFile();
 		
+		/*System.out.println(KMeans.kMeansAverageSquaredError(
+				POKEMON_TRAINING_DATASET, 23, 25, pokemonNames, 1000));*/
+		
 		//doExperiment1();
 		//doExperiment2();
 		//doExperiment3();
 		//doExperiment4();
 		//doExperiment5();		
 	}
-	
+		
 	private static void doExperiment1() {
 		System.out.println("DIGITS");
 		KMeans.doKMeans(DIGIT_TRAINING_DATASET, 5, 15, digitNames);

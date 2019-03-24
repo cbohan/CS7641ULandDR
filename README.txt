@@ -21,6 +21,11 @@ For doExperiment5, there are two try catch blocks. One for PCA and one for ICA. 
 these blocks are two lines:
 //int[] pokemonClusters = KMeans.doKMeans(icaPokemonSansClassIndex, 34, 25, pokemonNames);
 int[] pokemonClusters = ExpectationMaximization.doEM(icaPokemonSansClassIndex, 34, 25, pokemonNames);
-
 Uncomment the first line and comment out the second line to perform K-means clustering and put those
 clusters into the data before neural network learning. Leave as is to to EM clustering.
+
+In the main method, there is the following line:
+/*System.out.println(KMeans.kMeansAverageSquaredError(
+	POKEMON_TRAINING_DATASET, 23, 25, pokemonNames, 1000));*/
+Uncomment this line to see the mean squared error for the Pokemon dataset using kmeans. Replace the
+number 23 with the number of clusters you want to use.
